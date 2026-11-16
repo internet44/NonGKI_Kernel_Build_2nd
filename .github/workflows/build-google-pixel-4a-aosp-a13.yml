@@ -127,15 +127,15 @@ jobs:
       - name: ⚙️ Get necessary tools
         uses: ./.github/workflows/build-ready
 
-      - name: 🩹 KernelSU Next legacy on 4.14 - declare tasklist_lock and init_task
+      - name: 🩹 KernelSU Next legacy on 4.14 - include linux/sched/task.h where task helpers are used
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
-          f=$(find -L . -path "*kernel/supercall/dispatch.c" -not -path "./out/*" | head -1)
-          echo "[+] $f"
-          if [ -n "$f" ] && ! grep -q "linux/sched/task.h" "$f"; then
-            sed -i '1i #include <linux/sched/task.h>' "$f"
-          fi
-          grep -n "sched/task.h" "$f"
+          for f in $(grep -rlE "tasklist_lock|init_task|put_task_struct|get_task_struct" KernelSU-Next/kernel --include=*.c); do
+            if ! grep -q "linux/sched/task.h" "$f"; then
+              sed -i '1i #include <linux/sched/task.h>' "$f"
+              echo "[+] include added: $f"
+            fi
+          done
         shell: bash
 
       - name: 🪝 Patch Kernel of SUSFS
