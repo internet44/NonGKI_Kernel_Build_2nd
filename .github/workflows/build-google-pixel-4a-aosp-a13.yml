@@ -133,8 +133,7 @@ jobs:
           f=$(find -L . -path "*kernel/supercall/dispatch.c" -not -path "./out/*" | head -1)
           echo "[+] $f"
           if [ -n "$f" ] && ! grep -q "linux/sched/task.h" "$f"; then
-            sed -i '0,/^#include/s//#include <linux\/sched\/task.h>
-#include/' "$f"
+            sed -i '1i #include <linux/sched/task.h>' "$f"
           fi
           grep -n "sched/task.h" "$f"
         shell: bash
