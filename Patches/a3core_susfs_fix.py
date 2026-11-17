@@ -104,10 +104,22 @@ orig_flow:
 ANCHOR = "\t\tu32 mask = mark->mask & IN_ALL_EVENTS;\n"
 
 
+FAN_SIG = "static void fanotify_fdinfo(struct seq_file *m, struct fsnotify_mark *mark)\n"
+SUSFS_IF = "#if defined(CONFIG_KSU_SUSFS_SUS_MOUNT) || defined(CONFIG_KSU_SUSFS_SUS_KSTAT)\n"
+
+
 def fix_fdinfo(src):
     assert src.count(ANCHOR) == 1, "fdinfo anchor not unique"
     assert "susfs_is_current_proc_umounted()" not in src, "already fixed"
-    return src.replace(ANCHOR, ANCHOR + FDINFO_BLOCK, 1)
+    src = src.replace(ANCHOR, ANCHOR + FDINFO_BLOCK, 1)
+    # A03 has CONFIG_FANOTIFY=y: show_fdinfo() takes the 3-arg callback under
+    # SUSFS, so fanotify_fdinfo needs the same (unused) file parameter.
+    assert src.count(FAN_SIG) == 1, "fanotify_fdinfo signature not found"
+    src = src.replace(FAN_SIG,
+        SUSFS_IF
+        + "static void fanotify_fdinfo(struct seq_file *m, struct fsnotify_mark *mark, struct file *file)\n"
+        + "#else\n" + FAN_SIG + "#endif\n", 1)
+    return src
 
 
 edit("fs/notify/fdinfo.c", fix_fdinfo)
