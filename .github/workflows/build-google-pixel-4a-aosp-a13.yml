@@ -1,4 +1,4 @@
-﻿name: Build Google Pixel 4a (AOSP Based A13) - BakaSU
+name: Build Google Pixel 4a (AOSP Based A13) - BakaSU
 
 on:
   workflow_call:
@@ -102,10 +102,10 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
 
     steps:
-      - name: â° Checkout repository
+      - name: ⏰ Checkout repository
         uses: actions/checkout@v6
 
-      - name: ðŸ› ï¸ Setup Container Environment
+      - name: 🛠️ Setup Container Environment
         run: |
           echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90assumeyes
           export DEBIAN_FRONTEND=noninteractive
@@ -121,19 +121,19 @@ jobs:
           git config --global --add safe.directory '*'
         shell: bash
 
-      - name: âŒ›ï¸ Compilation environment preparation
+      - name: ⌛️ Compilation environment preparation
         uses: ./.github/workflows/build-env
 
-      - name: âš™ï¸ Get necessary tools
+      - name: ⚙️ Get necessary tools
         uses: ./.github/workflows/build-ready
 
-      - name: ðŸª Patch Kernel of SUSFS
+      - name: 🪝 Patch Kernel of SUSFS
         uses: ./.github/workflows/patch-susfs
 
-      - name: ðŸ”— Patch for no-kprobe
+      - name: 🔗 Patch for no-kprobe
         uses: ./.github/workflows/patch-no-kprobe
 
-      - name: ðŸª› Extra Kernel Options
+      - name: 🪛 Extra Kernel Options
         run: |
           # Only ${{ env.DEVICE_NAME }} use it.
           cd $GITHUB_WORKSPACE/device_kernel
@@ -165,16 +165,16 @@ jobs:
           sed -i 's/hap_ignore_next_request();/;/g' drivers/input/misc/fpc1020_platform_tee.c
           sed -i 's/CONFIG_INCREMENTAL_FS=m/CONFIG_INCREMENTAL_FS=y/g' arch/arm64/configs/$DEFCONFIG_NAME
 
-      - name: ðŸ§° Patch Kernel of Re:Kernel
+      - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
 
-      - name: ðŸ’¿ Patch Kernel of Droidspaces
+      - name: 💿 Patch Kernel of Droidspaces
         uses: ./.github/workflows/patch-droidspaces
 
-      - name: ðŸ”’ Patch Kernel of Baseband Guard
+      - name: 🔒 Patch Kernel of Baseband Guard
         uses: ./.github/workflows/patch-baseband-guard
 
-      - name: â— Pixel 4a BBG Only
+      - name: ❗ Pixel 4a BBG Only
         if: env.BASEBAND_GUARD_ENABLE == 'true'
         shell: bash
         run: |
@@ -183,20 +183,20 @@ jobs:
           echo "[+] Fixed BBG"
           sed -i "s|grep -q '#define DEFINE_LSM(lsm)'|grep -q '\\\#define DEFINE_LSM(lsm)'|" security/selinux/Makefile    
       
-      - name: ðŸ›¡ï¸ Patch Kernel of NoMount
+      - name: 🛡️ Patch Kernel of NoMount
         uses: ./.github/workflows/patch-nomount
 
-      - name: â›” Patch Kernel of fgetpriority
+      - name: ⛔ Patch Kernel of fgetpriority
         uses: ./.github/workflows/patch-fgetpriority
 
-      - name: ðŸ›œ Patch Kernel of VPNHide
+      - name: 🛜 Patch Kernel of VPNHide
         uses: ./.github/workflows/patch-vpnhide
 
-      - name: ðŸš€ Build Process
+      - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
 
-      - name: ðŸ”© Pack Process
+      - name: 🔩 Pack Process
         uses: ./.github/workflows/pack-process
 
-      - name: âœï¸ Upload Artifacts
+      - name: ✏️ Upload Artifacts
         uses: ./.github/workflows/upload-files
