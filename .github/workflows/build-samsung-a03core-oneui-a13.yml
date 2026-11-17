@@ -138,7 +138,7 @@ jobs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
-          python3 $GITHUB_WORKSPACE/Patches/a3core_susfs_fix.py
+          python3 /tmp/Patches/a3core_susfs_fix.py
 
       - name: 🔗 Patch for no-kprobe
         uses: ./.github/workflows/patch-no-kprobe
