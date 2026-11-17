@@ -142,6 +142,7 @@ jobs:
           cd $GITHUB_WORKSPACE/device_kernel
           echo "DTC_OVERLAY_TEST_EXT=$PWD/tools/mkdtimg/ufdt_apply_overlay" >> $GITHUB_ENV
           echo "DTC_OVERLAY_VTS_EXT=$PWD/tools/mkdtimg/ufdt_verify_overlay_host" >> $GITHUB_ENV
+          chmod +x tools/mkdtimg/* || true
           echo '#!/bin/sh' > scripts/setlocalversion
           chmod +x scripts/setlocalversion
           sed -i 's/CONFIG_LOCALVERSION_AUTO=y/# CONFIG_LOCALVERSION_AUTO is not set/g' arch/arm64/configs/$DEFCONFIG_NAME
